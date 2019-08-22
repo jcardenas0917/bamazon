@@ -24,19 +24,21 @@ connection.connect(function (err) {
 
 // display list of products for user to choose from.
 var displayProduct = list => {
-    console.log("| "+"Product Name |"+" "+"Department |"+" "+"Price |");
+    console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |");
+    console.log("----------------------------------------");
     for (var i = 0; i < list.length; i++) {
 
-        console.log("| "+list[i].product_name + "| " + list[i].department_name + "| "+ list[i].price)+" |";
-        console.log("-----------------------")
+        console.log("| "+ list[i].item_id+" | " + list[i].product_name + "     |" + list[i].department_name + "    |" + list[i].price + "  |");
+        // console.log("----------------------------------------")
     }
-    connection.end();
+    // connection.end();
+    start()
 }
 console.log("List of all available products...\n");
 connection.query("SELECT * FROM products", function (err, res) {
     if (err) throw err;
     // Log all results of the SELECT statement
-      displayProduct(res)
+    displayProduct(res)
     // console.log(res);
 
 });
@@ -60,6 +62,5 @@ var start = () => {
 
         ])
 
-
-
+    connection.end()
 }
