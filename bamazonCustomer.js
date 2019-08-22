@@ -18,49 +18,60 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId + "\n");
-    // connection.end();
-});
-
-// display list of products for user to choose from.
-var displayProduct = list => {
-    console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |");
-    console.log("----------------------------------------");
-    for (var i = 0; i < list.length; i++) {
-
-        console.log("| "+ list[i].item_id+" | " + list[i].product_name + "     |" + list[i].department_name + "    |" + list[i].price + "  |");
-        // console.log("----------------------------------------")
-    }
-    // connection.end();
     start()
-}
-console.log("List of all available products...\n");
-connection.query("SELECT * FROM products", function (err, res) {
-    if (err) throw err;
-    // Log all results of the SELECT statement
-    displayProduct(res)
-    // console.log(res);
-
 });
 
 //open store and asks customer which product they would like to buy.
 var start = () => {
+    console.log("List of all available products...\n");
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |");
+        console.log("----------------------------------------");
+        for (var i = 0; i < res.length; i++) {
 
-    inquirer
-        .prompt([
-            // Here we create a basic text prompt.
-            {
-                type: "input",
-                message: "Please enter the id of the item you would like to buy?",
-                name: "item_id"
-            },
-            {
-                type: "input",
-                message: "How many units would you like to buy?",
-                name: "item_id"
-            },
+            console.log("| " + res[i].item_id + " | " + res[i].product_name + "     |" + res[i].department_name + "    |" + res[i].price + "  |");
 
-        ])
+        }
 
-    connection.end()
+
+        inquirer
+            .prompt([
+                // Here we create a basic text prompt.
+                {
+                    type: "input",
+                    message: "Pleas choose the ID of the item you want to buy?",
+                    name: "id"
+                },
+
+                {
+                    type: "input",
+                    message: "How many units would you like to buy?",
+                    name: "quantity"
+                },
+
+            ])
+            .then(function (answer) {
+                connection.query(
+                    "UPDATE products SET ? WHERE ?",
+                    [
+                        {
+                            stock_quantity: answer.quantity
+                        },
+                        {
+                            item_id: answer.id
+                        }
+                    ],
+                    function (error) {
+                        if (error) throw err;
+                        console.log("Bid placed successfully!");
+                        //   start();
+                        connection.end();
+                    }
+                );
+            });
+    });
 }
+
+
+
