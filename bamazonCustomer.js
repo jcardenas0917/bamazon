@@ -15,34 +15,67 @@ var connection = mysql.createConnection({
     password: "root",
     database: "bamazon"
 });
-
+//connect to DB and update the stock after purchase
 connection.connect(function (err) {
     if (err) throw err;
-    start()
+    start();
 });
-var updateStock = (id,quantity)=>{
-         connection.query("SELECT stock_quantity FROM products WHERE item_id=?", [id], function(err, result) {
+
+var displayTotalPurchase = (iId,quan) => {
+    connection.query("SELECT price FROM products WHERE item_id=?", [iId], function (err, result) {
         if (err) throw err;
-        var value = result[0].stock_quantity;
-        connection.query(
-            "UPDATE products SET ? WHERE ?",
-            [
+        var itemPrice = result[0].price;
+        var totalPurchase = itemPrice*quan;
+        console.log("Your total purchase is $"+ totalPurchase);
+        connection.end();
+    })
+} 
+var updateStock = (id, quantity) => {
+    connection.query("SELECT stock_quantity FROM products WHERE item_id=?", [id], function (err, result) {
+        if (err) throw err;
+        var stockValue = result[0].stock_quantity;
+        if (quantity > stockValue) {
+            console.log("Sorry there is not enough stock available to fullfill your order")
+            inquirer
+            .prompt([
+                // Here we create a basic text prompt.
                 {
-                    stock_quantity: value - quantity
-                },
-                {
-                    item_id:id
+                    type: "input",
+                    message: "Would you like to enter a different amount? Enter Y or N?",
+                    name: "retry",
+                    
                 }
-            ],
-            function (error) {
-                if (error) throw error;
-                //   start();
-                console.log("stock updated")
-                connection.end();
-            }
-        );
-      });
-    
+            ]).then(function (ans) {
+                if (ans.retry==="Y"|| ans.retry==="y"){
+                    start()
+                }else if(ans.retry==="N"|| ans.retry==="n"){
+                    console.log("Have a good day!")
+                    connection.end();
+                }
+            });
+        } else{
+
+            connection.query(
+                "UPDATE products SET ? WHERE ?",
+                [
+                    {
+                        stock_quantity: stockValue - quantity
+                    },
+                    {
+                        item_id: id
+                    }
+                ],
+                function (error) {
+                    if (error) throw error;
+                    //   start();
+                    
+                    displayTotalPurchase(id,quantity)
+                    // connection.end();
+                }
+            );
+        };
+    });
+
 }
 //open store and asks customer which product they would like to buy.
 var start = () => {
@@ -75,7 +108,7 @@ var start = () => {
 
             ])
             .then(function (answer) {
-                updateStock(answer.id,answer.quantity);
+                updateStock(answer.id, answer.quantity);
             });
     });
 }
