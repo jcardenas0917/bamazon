@@ -20,7 +20,30 @@ connection.connect(function (err) {
     if (err) throw err;
     start()
 });
-
+var updateStock = (id,quantity)=>{
+         connection.query("SELECT stock_quantity FROM products WHERE item_id=?", [id], function(err, result) {
+        if (err) throw err;
+        var value = result[0].stock_quantity;
+        connection.query(
+            "UPDATE products SET ? WHERE ?",
+            [
+                {
+                    stock_quantity: value - quantity
+                },
+                {
+                    item_id:id
+                }
+            ],
+            function (error) {
+                if (error) throw error;
+                //   start();
+                console.log("stock updated")
+                connection.end();
+            }
+        );
+      });
+    
+}
 //open store and asks customer which product they would like to buy.
 var start = () => {
     console.log("List of all available products...\n");
@@ -40,7 +63,7 @@ var start = () => {
                 // Here we create a basic text prompt.
                 {
                     type: "input",
-                    message: "Pleas choose the ID of the item you want to buy?",
+                    message: "Please choose the ID of the item you want to buy?",
                     name: "id"
                 },
 
@@ -52,23 +75,7 @@ var start = () => {
 
             ])
             .then(function (answer) {
-                connection.query(
-                    "UPDATE products SET ? WHERE ?",
-                    [
-                        {
-                            stock_quantity: answer.quantity
-                        },
-                        {
-                            item_id: answer.id
-                        }
-                    ],
-                    function (error) {
-                        if (error) throw err;
-                        console.log("Bid placed successfully!");
-                        //   start();
-                        connection.end();
-                    }
-                );
+                updateStock(answer.id,answer.quantity);
             });
     });
 }
