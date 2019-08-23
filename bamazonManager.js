@@ -79,6 +79,7 @@ var managerView = () => {
             },
         ]).then(function (res) {
             switch (res.data) {
+                //If manager chooses to view products
                 case "View Products for Sale":
                     connection.query("SELECT * FROM products", function (err, res) {
                         if (err) throw err;
@@ -92,6 +93,7 @@ var managerView = () => {
                         managerView();
                     });
                     break;
+                    //If manager wants to check low inventory
                 case "View Low Inventory":
                         connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
                             if (err) throw err;
@@ -105,10 +107,10 @@ var managerView = () => {
                             managerView();
                         });
                         break;
+                        //If manager wants to add stock to items
                 case "Add to Inventory":
                         inquirer
                         .prompt([
-                            // Here we create a basic text prompt to prompt the user what item to purchase and how many.
                             {
                                 type: "input",
                                 message: "Please choose the ID of the item you want to add inventory stock",
@@ -125,6 +127,7 @@ var managerView = () => {
 
                         });
                         break;
+                        //If manager wants to add a new product for sale
                 case "Add New Product":
                         inquirer
                         .prompt([
