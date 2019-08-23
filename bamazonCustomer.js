@@ -21,15 +21,18 @@ connection.connect(function (err) {
     start();
 });
 
-var displayTotalPurchase = (iId,quan) => {
-    connection.query("SELECT price FROM products WHERE item_id=?", [iId], function (err, result) {
+//Displays total amount of the purchase
+var displayTotalPurchase = (id,quantity) => {
+    connection.query("SELECT price FROM products WHERE item_id=?", [id], function (err, result) {
         if (err) throw err;
         var itemPrice = result[0].price;
-        var totalPurchase = itemPrice*quan;
+        var totalPurchase = itemPrice*quantity;
+        console.log("Thank You");
         console.log("Your total purchase is $"+ totalPurchase);
         connection.end();
     })
 } 
+//update the stock
 var updateStock = (id, quantity) => {
     connection.query("SELECT stock_quantity FROM products WHERE item_id=?", [id], function (err, result) {
         if (err) throw err;
@@ -38,23 +41,25 @@ var updateStock = (id, quantity) => {
             console.log("Sorry there is not enough stock available to fullfill your order")
             inquirer
             .prompt([
+                //if the user tries to buy more than what is available in stock we ask then to try again
                 // Here we create a basic text prompt.
                 {
-                    type: "input",
-                    message: "Would you like to enter a different amount? Enter Y or N?",
+                    type: "confirm",
+                    message: "Would you like to try again?",
                     name: "retry",
                     
                 }
             ]).then(function (ans) {
-                if (ans.retry==="Y"|| ans.retry==="y"){
+                //Check if the user wants to try purchasing the item again.
+                if (ans.retry){
                     start()
-                }else if(ans.retry==="N"|| ans.retry==="n"){
+                }else{
                     console.log("Have a good day!")
                     connection.end();
                 }
             });
         } else{
-
+            //the stock gets updated based on the amount chosen by the user
             connection.query(
                 "UPDATE products SET ? WHERE ?",
                 [
@@ -70,7 +75,7 @@ var updateStock = (id, quantity) => {
                     //   start();
                     
                     displayTotalPurchase(id,quantity)
-                    // connection.end();
+                    
                 }
             );
         };
@@ -93,7 +98,7 @@ var start = () => {
 
         inquirer
             .prompt([
-                // Here we create a basic text prompt.
+                // Here we create a basic text prompt to prompt the user what item to purchase and how many.
                 {
                     type: "input",
                     message: "Please choose the ID of the item you want to buy?",
