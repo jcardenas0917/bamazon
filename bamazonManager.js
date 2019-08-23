@@ -55,15 +55,15 @@ var createProduct = (name,department,price,quantity) => {
             price: parseFloat(price),
             stock_quantity:  parseInt(quantity)
         },
-        function (err, res) {
+        function (err) {
             if (err) throw err;
-                
+            console.log("New product "+ name + " inserted"); 
+            console.log(query.sql);
+            managerView();
         }
        
     );
-    console.log("New product "+ name + " inserted"); 
-    console.log(query.sql);
-    managerView();
+    
 };
 
 //Starts Managers view application
@@ -153,7 +153,8 @@ var managerView = () => {
                         ])
                         .then(function (items) {
                             createProduct(items.item_name,items.department,items.price,items.quantity);
-                        })
+                        });
+                        break;
                     default :
                     connection.end()
 
