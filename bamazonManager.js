@@ -59,13 +59,84 @@ var createProduct = (name, department, price, quantity) => {
         function (err) {
             if (err) throw err;
             console.log("New product " + name + " inserted");
-            console.log(query.sql);
             managerView();
         }
 
     );
 
 };
+//ALL MANAGER FUNCTIONS
+//--------------------------------------------------------------------
+var viewProduct = () => {
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        var table = cTable.getTable(res);
+        console.log(table);
+
+        managerView();
+    });
+}
+
+var viewLowInventory = () => {
+    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
+        if (err) throw err;
+        var table = cTable.getTable(res);
+        console.log(table);
+        managerView();
+    });
+}
+
+var addInventory = () => {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Please choose the ID of the item you want to add inventory stock",
+                name: "id"
+            },
+
+            {
+                type: "input",
+                message: "How many units would you like to add?",
+                name: "quantity"
+            },
+        ]).then(function (res) {
+            updateStock(res.id, res.quantity);
+
+        });
+}
+
+var addProduct = () => {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Enter product name",
+                name: "item_name"
+            },
+            {
+                type: "input",
+                message: "Enter department name",
+                name: "department"
+            },
+            {
+                type: "input",
+                message: "Enter price",
+                name: "price"
+            },
+            {
+                type: "input",
+                message: "Enter stock quantity",
+                name: "quantity"
+            },
+
+
+        ])
+        .then(function (items) {
+            createProduct(items.item_name, items.department, items.price, items.quantity);
+        });
+
+}
 
 //Starts Managers view application
 var managerView = () => {
@@ -82,73 +153,19 @@ var managerView = () => {
             switch (res.data) {
                 //If manager chooses to view products
                 case "View Products for Sale":
-                    connection.query("SELECT * FROM products", function (err, res) {
-                        if (err) throw err;
-                        var table = cTable.getTable(res);
-                        console.log(table);
-
-                        managerView();
-                    });
+                    viewProduct();
                     break;
                 //If manager wants to check low inventory
                 case "View Low Inventory":
-                    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
-                        if (err) throw err;
-                        var table = cTable.getTable(res);
-                        console.log(table);
-                        managerView();
-                    });
+                    viewLowInventory();
                     break;
                 //If manager wants to add stock to items
                 case "Add to Inventory":
-                    inquirer
-                        .prompt([
-                            {
-                                type: "input",
-                                message: "Please choose the ID of the item you want to add inventory stock",
-                                name: "id"
-                            },
-
-                            {
-                                type: "input",
-                                message: "How many units would you like to add?",
-                                name: "quantity"
-                            },
-                        ]).then(function (res) {
-                            updateStock(res.id, res.quantity);
-
-                        });
+                    addInventory();
                     break;
                 //If manager wants to add a new product for sale
                 case "Add New Product":
-                    inquirer
-                        .prompt([
-                            {
-                                type: "input",
-                                message: "Enter product name",
-                                name: "item_name"
-                            },
-                            {
-                                type: "input",
-                                message: "Enter department name",
-                                name: "department"
-                            },
-                            {
-                                type: "input",
-                                message: "Enter price",
-                                name: "price"
-                            },
-                            {
-                                type: "input",
-                                message: "Enter stock quantity",
-                                name: "quantity"
-                            },
-
-
-                        ])
-                        .then(function (items) {
-                            createProduct(items.item_name, items.department, items.price, items.quantity);
-                        });
+                    addProduct();
                     break;
                 default:
                     connection.end()
