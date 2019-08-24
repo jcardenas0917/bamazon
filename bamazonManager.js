@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var cTable = require('console.table');
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -37,8 +38,8 @@ var updateStock = (id, quantity) => {
             function (error) {
                 if (error) throw error;
                 //   start();
-                
-                console.log("inventory updated "+quantity+ " units added to item " + id);
+
+                console.log("inventory updated " + quantity + " units added to item " + id);
                 managerView();
             }
         );
@@ -46,24 +47,24 @@ var updateStock = (id, quantity) => {
 };
 
 ///create product
-var createProduct = (name,department,price,quantity) => {
-    console.log(name,department,price,quantity)
+var createProduct = (name, department, price, quantity) => {
+    console.log(name, department, price, quantity)
     var query = connection.query("INSERT INTO products SET ?",
         {
             product_name: name,
             department_name: department,
             price: parseFloat(price),
-            stock_quantity:  parseInt(quantity)
+            stock_quantity: parseInt(quantity)
         },
         function (err) {
             if (err) throw err;
-            console.log("New product "+ name + " inserted"); 
+            console.log("New product " + name + " inserted");
             console.log(query.sql);
             managerView();
         }
-       
+
     );
-    
+
 };
 
 //Starts Managers view application
@@ -75,7 +76,7 @@ var managerView = () => {
                 type: "rawlist",
                 message: "What data would you like to do?",
                 name: "data",
-                choices: [`View Products for Sale`, `View Low Inventory`, `Add to Inventory`, `Add New Product`,"Exit"]
+                choices: [`View Products for Sale`, `View Low Inventory`, `Add to Inventory`, `Add New Product`, "Exit"]
             },
         ]).then(function (res) {
             switch (res.data) {
@@ -83,40 +84,31 @@ var managerView = () => {
                 case "View Products for Sale":
                     connection.query("SELECT * FROM products", function (err, res) {
                         if (err) throw err;
-                        console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |" + "Stock " + " |");
-                        console.log("----------------------------------------");
-                        for (var i = 0; i < res.length; i++) {
+                        var table = cTable.getTable(res);
+                        console.log(table);
 
-                            console.log("| " + res[i].item_id + " | " + res[i].product_name + "     |" + res[i].department_name + "    |" + res[i].price + "  |" + res[i].stock_quantity);
-
-                        }
                         managerView();
                     });
                     break;
-                    //If manager wants to check low inventory
+                //If manager wants to check low inventory
                 case "View Low Inventory":
-                        connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
-                            if (err) throw err;
-                            console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |" + "Stock " + " |");console.log("|" + "Product Name" + " |" + "Department " + " | " + "Price"+ " | ");
-                            console.log("----------------------------------------");
-                            for (var i = 0; i < res.length; i++) {
-    
-                                console.log("| " + res[i].item_id + " | " + res[i].product_name + "     |" + res[i].department_name + "    |" + res[i].price + "  |" + res[i].stock_quantity);
-    
-                            }
-                            managerView();
-                        });
-                        break;
-                        //If manager wants to add stock to items
+                    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
+                        if (err) throw err;
+                        var table = cTable.getTable(res);
+                        console.log(table);
+                        managerView();
+                    });
+                    break;
+                //If manager wants to add stock to items
                 case "Add to Inventory":
-                        inquirer
+                    inquirer
                         .prompt([
                             {
                                 type: "input",
                                 message: "Please choose the ID of the item you want to add inventory stock",
                                 name: "id"
                             },
-            
+
                             {
                                 type: "input",
                                 message: "How many units would you like to add?",
@@ -126,10 +118,10 @@ var managerView = () => {
                             updateStock(res.id, res.quantity);
 
                         });
-                        break;
-                        //If manager wants to add a new product for sale
+                    break;
+                //If manager wants to add a new product for sale
                 case "Add New Product":
-                        inquirer
+                    inquirer
                         .prompt([
                             {
                                 type: "input",
@@ -151,14 +143,14 @@ var managerView = () => {
                                 message: "Enter stock quantity",
                                 name: "quantity"
                             },
-                            
-                            
+
+
                         ])
                         .then(function (items) {
-                            createProduct(items.item_name,items.department,items.price,items.quantity);
+                            createProduct(items.item_name, items.department, items.price, items.quantity);
                         });
-                        break;
-                    default :
+                    break;
+                default:
                     connection.end()
 
             };

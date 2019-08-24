@@ -2,6 +2,7 @@
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var cTable = require('console.table');
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -85,16 +86,10 @@ var updateStock = (id, quantity) => {
 //open store and asks customer which product they would like to buy.
 var start = () => {
     console.log("List of all available products...\n");
-    connection.query("SELECT * FROM products", function (err, res) {
-    console.log("|" + "Product Name" + " |" + "Department " + " | " + "Price"+ " | ");
-
+    connection.query("SELECT item_id,product_name,department_name,price FROM products", function (err, res) {
         if (err) throw err;
-        console.log("----------------------------------------");
-        for (var i = 0; i < res.length; i++) {
-
-            console.log("| " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + "    |" + res[i].price + "  |");
-
-        }
+        var table = cTable.getTable(res);
+        console.log(table);
 
 
         inquirer
