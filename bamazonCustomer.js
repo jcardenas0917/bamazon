@@ -86,12 +86,13 @@ var updateStock = (id, quantity) => {
 var start = () => {
     console.log("List of all available products...\n");
     connection.query("SELECT * FROM products", function (err, res) {
+    console.log("|" + "Product Name" + " |" + "Department " + " | " + "Price"+ " | ");
+
         if (err) throw err;
-        console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |");
         console.log("----------------------------------------");
         for (var i = 0; i < res.length; i++) {
 
-            console.log("| " + res[i].item_id + " | " + res[i].product_name + "     |" + res[i].department_name + "    |" + res[i].price + "  |");
+            console.log("| " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + "    |" + res[i].price + "  |");
 
         }
 

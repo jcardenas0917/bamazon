@@ -97,7 +97,7 @@ var managerView = () => {
                 case "View Low Inventory":
                         connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
                             if (err) throw err;
-                            console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |" + "Stock " + " |");
+                            console.log("| " + "Product Name |" + " " + "Department |" + " " + "Price |" + "Stock " + " |");console.log("|" + "Product Name" + " |" + "Department " + " | " + "Price"+ " | ");
                             console.log("----------------------------------------");
                             for (var i = 0; i < res.length; i++) {
     
