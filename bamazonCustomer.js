@@ -98,7 +98,13 @@ var start = () => {
                 {
                     type: "input",
                     message: "Please choose the ID of the item you want to buy?",
-                    name: "id"
+                    name: "id",
+                    validate: function(value) {
+                        if (isNaN(value) === false) {
+                          return true;
+                        }
+                        return false;
+                      }
                 },
 
                 {

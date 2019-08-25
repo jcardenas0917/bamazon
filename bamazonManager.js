@@ -22,9 +22,10 @@ connection.connect(function (err) {
 
 //updated stock after manager enters the new amount
 var updateStock = (id, quantity) => {
-    connection.query("SELECT stock_quantity FROM products WHERE item_id=?", [id], function (err, result) {
+    connection.query("SELECT stock_quantity, product_name FROM products WHERE item_id=?", [id], function (err, result) {
         if (err) throw err;
         var stockValue = result[0].stock_quantity;
+        var product = result[0].product_name;
         connection.query(
             "UPDATE products SET ? WHERE ?",
             [
@@ -38,7 +39,7 @@ var updateStock = (id, quantity) => {
             function (error) {
                 if (error) throw error;
                 //   start();
-
+                console.log("Adding " + quantity + " to " + product + " stock quantity");
                 console.log("inventory updated " + quantity + " units added to item " + id);
                 managerView();
             }
@@ -58,7 +59,7 @@ var createProduct = (name, department, price, quantity) => {
         },
         function (err) {
             if (err) throw err;
-            console.log("New product " + name + " inserted");
+            console.log("New product " + name + " created");
             managerView();
         }
 
@@ -71,6 +72,8 @@ var viewProduct = () => {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         var table = cTable.getTable(res);
+        console.log("loading items....")
+        console.log("Items loaded")
         console.log(table);
 
         managerView();
@@ -81,6 +84,8 @@ var viewLowInventory = () => {
     connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
         if (err) throw err;
         var table = cTable.getTable(res);
+        console.log("loading items....")
+        console.log("Items loaded")
         console.log(table);
         managerView();
     });
@@ -98,8 +103,15 @@ var addInventory = () => {
             {
                 type: "input",
                 message: "How many units would you like to add?",
-                name: "quantity"
+                name: "quantity",
+                validate: function(value) {
+                    if (isNaN(value) === false) {
+                      return true;
+                    }
+                    return false;
+                  }
             },
+            
         ]).then(function (res) {
             updateStock(res.id, res.quantity);
 
