@@ -19,6 +19,10 @@ Run npm i mysql to install the library that will allow us to connec to the Mysql
 Run npm i console.table to display the table properly for better UI and UX.
 Run npm i inquirer to display the questions to the user.
 
-Demo:
+Demo 1:
 
-https://drive.google.com/file/d/16D6uMGxBzTIZTuORizK8MvmaCrB85U7J/view
+https://drive.google.com/file/d/16D6uMGxBzTIZTuORizK8MvmaCrB85U7J/view?usp=sharing
+
+Demo 2:
+
+https://drive.google.com/file/d/1juvtPeyGruoH9KO-gIHJ4unhllW2p4pd/view?usp=sharing
